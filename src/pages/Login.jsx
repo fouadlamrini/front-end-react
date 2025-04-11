@@ -55,6 +55,7 @@ const Login = () => {
     
     try {
       const result = await login(credentials);
+      console.log(result);
       if (result.success) {
         navigate('/');
       } else {

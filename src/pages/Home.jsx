@@ -18,14 +18,14 @@ const Home = () => {
           minHeight: '60vh',
         }}
       >
-        <Typography variant="h3" component="h2" gutterBottom>
-          Welcome to Our E-Commerce Store Game Express
-        </Typography>
-        <Typography variant="h5" component="h2" gutterBottom>
-          {isAuthenticated
-            ? `Hello, ${user.user?.name}!`
-            : 'Please login or register to continue'}
-        </Typography>
+       <Typography variant="h3" component="h2" gutterBottom>
+  Welcome to Our E-Commerce Store Game Express
+</Typography>
+<Typography variant="h5" component="h2" gutterBottom>
+  {isAuthenticated
+    ? `Hello, ${user.name}!`
+    : 'Please login or register to continue'}
+</Typography>
         {!isAuthenticated && (
           <Box sx={{ mt: 3 }}>
             <Button

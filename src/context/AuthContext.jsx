@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect , useCallback } from 'react';
 import api from '../api/axios';
 
 
@@ -7,17 +7,19 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
+  
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Check  user  auth
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuth = async (credentials) => {
+      
       try {
         if (token) {
-          const { data } = await api.get('/user');
-          console.log(data);
-          setUser(data);
+          console.log(token) ;
+          const user = JSON.parse(localStorage.getItem('user'));
+          setUser(user);
           setIsAuthenticated(true);
         }
       } catch (err) {
@@ -29,22 +31,29 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkAuth();
-  }, [token]);
+  },[]);
 
 
-   // roles
-   const hasRole = (requiredRoles) => {
-    if (!requiredRoles || requiredRoles.length === 0) return true;
-    if (!user?.roles) return false;
-    return requiredRoles.some(role => user.roles.includes(role));
-  };
+  const hasRole = useCallback((requiredRoleOrRoles) => {
+    if (!user || !Array.isArray(user.roles) || user.roles.length === 0) {
+        return false;
+    }
+    const userRole = user.roles[0].name;
+    if (!userRole) return false;
 
+    const requiredRoles = Array.isArray(requiredRoleOrRoles) ? requiredRoleOrRoles : [requiredRoleOrRoles];
+
+    return requiredRoles.includes(userRole);
+
+}, [user]);
 
   const login = async (credentials) => {
+    console.log(credentials);
     try {
       const { data } = await api.post('/login', credentials);
-      
+      console.log(data) ;
       localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
       setToken(data.token);
       setUser(data.user);
       setIsAuthenticated(true);
@@ -59,9 +68,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data } = await api.post('/register', credentials);
     
-      localStorage.setItem('token', data.data.token);
-      setToken(data.data.token);
-      setUser(data.data.user);
+      localStorage.setItem('token', data.token);
+      setToken(data.token);
+      setUser(data.user);
       setIsAuthenticated(true);
       return { success: true };
     } catch (error) {

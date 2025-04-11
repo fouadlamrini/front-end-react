@@ -22,8 +22,6 @@ const ProtectedRoute = ({ roles  }) => {
   if (roles) {
     const hasRequiredRoles = hasRole(roles);
       
-       
-    
     if (!hasRequiredRoles) {
       return <Navigate to="/unauthorized" replace />;
     }
